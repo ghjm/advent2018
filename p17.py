@@ -1,7 +1,6 @@
 import sys
 import datetime
 import re
-import pickle
 
 def read_data():
     r = re.compile('([xy])=(\d+), ([xy])=(\d+)..(\d+)')
