@@ -45,33 +45,20 @@ typechars = {0: '.', 1: '=', 2: '|'}
 usable_equip = {0: {'c', 't'}, 1: {'c', 'n'}, 2: {'t', 'n'}}
 moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-def gen_state_graph(types_grid):
-    open_list = [(0, 0, 't')]
-    closed_list = []
-    states = dict()
-    while len(open_list) > 0:
-        cur_state = open_list.pop()
-        closed_list.append(cur_state)
-        x, y, equip = cur_state
-        if cur_state not in states:
-            states[cur_state] = list()
-        for ne in usable_equip[types_grid[y][x]] - {equip}:
-            new_state = (x, y, ne)
-            states[cur_state].append((7, new_state))
-            if new_state not in closed_list:
-                open_list.append(new_state)
-        for m in moves:
-            nx = x + m[0]
-            ny = y + m[1]
-            if 0 <= ny < len(types_grid) and 0 <= nx < len(types_grid[0]):
-                if equip in usable_equip[types_grid[ny][nx]]:
-                    new_state = (nx, ny, equip)
-                    states[cur_state].append((1, new_state))
-                    if new_state not in closed_list:
-                        open_list.append(new_state)
-    return states
+def get_next_states(types_grid, cur_state):
+    next_states = list()
+    x, y, equip = cur_state
+    for ne in usable_equip[types_grid[y][x]] - {equip}:
+        next_states.append((7, (x, y, ne)))
+    for m in moves:
+        nx = x + m[0]
+        ny = y + m[1]
+        if 0 <= ny < len(types_grid) and 0 <= nx < len(types_grid[0]):
+            if equip in usable_equip[types_grid[ny][nx]]:
+                next_states.append((1, (nx, ny, equip)))
+    return next_states
 
-def find_shortest_path(state_graph, dest):
+def find_shortest_path(type_grid, dest):
     start = (0, 0, 't')
     end = (dest[0], dest[1], 't')
     frontier = list()
@@ -85,7 +72,8 @@ def find_shortest_path(state_graph, dest):
         current = heapq.heappop(frontier)[1]
         if current == end:
             break
-        for cost, next in state_graph[current]:
+
+        for cost, next in get_next_states(type_grid, current):
             new_cost = cost_so_far[current] + cost
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
@@ -111,8 +99,7 @@ def main():
         for x in range(target[0]+1):
             risk += types_grid[y][x]
     print 'Part A:', risk
-    state_graph = gen_state_graph(types_grid)
-    shortest_path, sp_cost = find_shortest_path(state_graph, target)
+    shortest_path, sp_cost = find_shortest_path(types_grid, target)
     print 'Part B:', sp_cost
 
 if __name__ == '__main__':
