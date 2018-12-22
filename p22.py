@@ -2,9 +2,6 @@ import sys
 import re
 import heapq
 
-#depth: 7740
-#target: 12,763
-
 def read_data():
     rd = re.compile('depth: (\d+)')
     rt = re.compile('target: (\d+),(\d+)')
@@ -87,11 +84,8 @@ def find_shortest_path(type_grid, dest):
         from_path = [came_from[from_path[0]]] + from_path
     return from_path, cost_so_far[end]
 
-
 def main():
     depth, target = read_data()
-    # depth = 510
-    # target = (10, 10)
     erosion_grid = calc_erosion(depth, target)
     types_grid = [[erosion_grid[y][x] % 3 for x in range(len(erosion_grid[y]))] for y in range(len(erosion_grid))]
     risk = 0
