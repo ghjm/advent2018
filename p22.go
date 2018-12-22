@@ -215,14 +215,8 @@ func findShortestPath(start state, dest state) ([]state, int, bool) {
 
 func main() {
 	readData22()
-/*
-    risk = 0
-    for y in range(target[1]+1):
-        for x in range(target[0]+1):
-            risk += types_grid[y][x]
-    print 'Part A:', risk
 
-*/
+	// Part A
 	risk := 0
 	for y := 0; y <= target.y; y++ {
 		for x := 0; x <= target.x; x++ {
@@ -231,6 +225,7 @@ func main() {
 	}
 	fmt.Println("Part A: ", risk)
 
+	// Part B
 	_, cost, ok := findShortestPath(state{xy{0,0},'t'}, state{target,'t'})
 	if ok {
 		fmt.Println("Part B: ", cost)
