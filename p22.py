@@ -69,14 +69,15 @@ def find_shortest_path(type_grid, dest):
         current = heapq.heappop(frontier)[1]
         if current == end:
             break
-
-        for cost, next in get_next_states(type_grid, current):
+        next_states = get_next_states(type_grid, current)
+        for cost, next in next_states:
             new_cost = cost_so_far[current] + cost
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
                 priority = new_cost + abs(dest[0] - next[0]) + abs(dest[1] - next[1])
                 heapq.heappush(frontier, (priority, next))
                 came_from[next] = current
+
     if end not in came_from:
         return None
     from_path = [end]
