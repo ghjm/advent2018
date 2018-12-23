@@ -3,8 +3,11 @@ package main
 import (
 	"bufio"
 	"container/heap"
+	"flag"
 	"fmt"
+	"log"
 	"os"
+	"runtime/pprof"
 	"strconv"
 	"strings"
 )
@@ -213,7 +216,21 @@ func findShortestPath(start state, dest state) ([]state, int, bool) {
 	return fromPath, costSoFar[dest], true
 }
 
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+
 func main() {
+
+	// Enable profiling support
+	flag.Parse()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_ = pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	readData22()
 
 	// Part A
