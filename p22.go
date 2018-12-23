@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"runtime/pprof"
-	"strconv"
 	"strings"
 )
 
@@ -24,12 +23,6 @@ type state struct {
 
 var depth int
 var target xy
-
-func atoi(s string) int {
-	i, err := strconv.ParseInt(s, 10, 32)
-	if err != nil { panic(err) }
-	return int(i)
-}
 
 func readData22() {
 	file, err := os.Open("input22.txt")
@@ -174,14 +167,6 @@ func (pq *PriorityQueue) Pop() interface{} {
 	item.index = -1 // for safety
 	*pq = old[0 : n-1]
 	return item
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	} else {
-		return x
-	}
 }
 
 func findShortestPath(start state, dest state) ([]state, int, bool) {
