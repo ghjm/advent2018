@@ -67,17 +67,18 @@ func initErosionValues(size xy, oldEv [][]int) [][]int {
 	return ev
 }
 
+var boundsMargin int = 100
 func getErosion(pos xy) int {
 	if len(erosionValues) == 0 {
 		erosionValues = initErosionValues(xy{100, 100}, erosionValues)
 	}
 	newsize := xy{len(erosionValues[0]), len(erosionValues)}
 	sizeChanged := false
-	for pos.x >= newsize.x {
+	for pos.x + boundsMargin >= newsize.x {
 		newsize.x *= 2
 		sizeChanged = true
 	}
-	for pos.y >= newsize.y {
+	for pos.y + boundsMargin >= newsize.y {
 		newsize.y *= 2
 		sizeChanged = true
 	}
@@ -87,21 +88,27 @@ func getErosion(pos xy) int {
 	if ero := erosionValues[pos.y][pos.x]; ero >= 0 {
 		return ero
 	}
-	var geo int
-	if pos.x == 0 && pos.y == 0 {
-		geo = 0
-	} else if pos.x == target.x && pos.y == target.y {
-		geo = 0
-	} else if pos.y == 0 {
-		geo = pos.x * 16807
-	} else if pos.x == 0 {
-		geo = pos.y * 48271
-	} else {
-		geo = getErosion(xy{pos.x - 1, pos.y}) * getErosion(xy{pos.x, pos.y - 1})
+	for y := 0; y <= pos.y + boundsMargin; y++ {
+		for x := 0; x <= pos.x + boundsMargin; x++ {
+			if erosionValues[y][x] < 0 {
+				var geo int
+				if x == 0 && y == 0 {
+					geo = 0
+				} else if x == target.x && y == target.y {
+					geo = 0
+				} else if y == 0 {
+					geo = x * 16807
+				} else if x == 0 {
+					geo = y * 48271
+				} else {
+					geo = erosionValues[y][x-1] * erosionValues[y-1][x]
+				}
+				ero := (geo + depth) % 20183
+				erosionValues[y][x] = ero
+			}
+		}
 	}
-	ero := (geo + depth) % 20183
-	erosionValues[pos.y][pos.x] = ero
-	return ero
+	return erosionValues[pos.y][pos.x]
 }
 
 func getType(pos xy) int {
@@ -232,6 +239,9 @@ func main() {
 	}
 
 	readData22()
+
+	// Precalculate
+	_ = getErosion(xy{target.x + 100, target.y + 100})
 
 	// Part A
 	risk := 0
